@@ -8,6 +8,7 @@
         <groupId>gg.endergebnis</groupId>
         <artifactId>rconmc-parent</artifactId>
         <version>0.2.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>rconmc-app</artifactId>

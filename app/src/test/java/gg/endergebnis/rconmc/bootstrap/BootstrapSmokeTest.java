@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import gg.endergebnis.rconmc.RconMcApplication;
 import gg.endergebnis.rconmc.discord.DiscordProperties;
-import gg.endergebnis.rconmc.whitelist.GuildConfigService;
-import gg.endergebnis.rconmc.whitelist.ServerService;
 import gg.endergebnis.rconmc.whitelist.WhitelistService;
+import gg.endergebnis.rconmc.whitelist.access.AccessService;
+import gg.endergebnis.rconmc.whitelist.guild.GuildConfigService;
+import gg.endergebnis.rconmc.whitelist.server.ServerService;
 import net.dv8tion.jda.api.JDA;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ class BootstrapSmokeTest {
     @Autowired
     private WhitelistService whitelistService;
 
+    @Autowired
+    private AccessService accessService;
+
     @Test
     void contextStartsWithFlywaySchemaAndWiredServices() {
         assertThat(discordProperties.toString()).doesNotContain("test-discord-token");
@@ -46,5 +50,6 @@ class BootstrapSmokeTest {
         assertThat(serverService.list(1L)).isEmpty();
         assertThat(whitelistService.findByMcUsername(1L, "nobody")).isEmpty();
         assertThat(guilds.status(1L)).isNotNull();
+        assertThat(accessService.list(1L)).isEmpty(); // Migration V2 (whitelist_bypass)
     }
 }

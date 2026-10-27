@@ -20,13 +20,17 @@
     <description>Discord bot that whitelists registered Minecraft players on multiple servers of multiple guilds</description>
 
     <modules>
-        <module>core</module>
-        <module>crypto</module>
-        <module>rcon</module>
-        <module>verify</module>
-        <module>persistence</module>
-        <module>whitelist</module>
-        <module>discord</module>
+        <!-- Fundament: Ports/Domain-Typen und Krypto, ohne Framework-Abhaengigkeiten -->
+        <module>modules/core</module>
+        <module>modules/crypto</module>
+        <!-- Datenhaltung und Fachlogik -->
+        <module>modules/persistence</module>
+        <module>modules/whitelist</module>
+        <!-- Adapter: alles, was mit der Aussenwelt spricht -->
+        <module>modules/adapters/rcon</module>
+        <module>modules/adapters/verify</module>
+        <module>modules/adapters/discord</module>
+        <!-- Startbares Artefakt -->
         <module>app</module>
     </modules>
 
