@@ -1,0 +1,29 @@
+rconmc:
+  discord:
+    token: ${DISCORD_TOKEN}
+  security:
+    # base64, 32 Byte: openssl rand -base64 32  (Verlust = gespeicherte RCON-Passwoerter nicht mehr lesbar)
+    master-key: ${RCONMC_MASTER_KEY}
+  servers:
+    max-per-guild: ${RCONMC_MAX_SERVERS_PER_GUILD:5}
+    # false = Hosts in privaten/lokalen Netzen ablehnen (empfohlen, sobald fremde Guilds den Bot nutzen)
+    allow-private-hosts: ${RCONMC_ALLOW_PRIVATE_HOSTS:true}
+
+spring:
+  datasource:
+    # SQLite-Datei; WAL + busy_timeout gegen SQLITE_BUSY, foreign_keys fuer die Referenzen im Schema.
+    url: jdbc:sqlite:${DB_PATH:./data/rconmc.db}?journal_mode=WAL&busy_timeout=5000&foreign_keys=on
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      # SQLite hat einen Schreiber. Kein Service haelt eine Transaktion ueber einen Server-Aufruf offen.
+      maximum-pool-size: 1
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    open-in-view: false
+    properties:
+      # sqlite-jdbc kennt kein OffsetDateTime-Binding; Instant daher als java.sql.Timestamp (Epoch-Millis) speichern.
+      hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
+    hibernate:
+      ddl-auto: none # Schema gehoert Flyway (persistence/src/main/resources/db/migration)
+  flyway:
+    enabled: true

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.2</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>gg.endergebnis</groupId>
+    <artifactId>rconmc-parent</artifactId>
+    <version>0.2.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>rconmc-parent</name>
+    <description>Discord bot that whitelists registered Minecraft players on multiple servers of multiple guilds</description>
+
+    <modules>
+        <module>core</module>
+        <module>crypto</module>
+        <module>rcon</module>
+        <module>verify</module>
+        <module>persistence</module>
+        <module>whitelist</module>
+        <module>discord</module>
+        <module>app</module>
+    </modules>
+
+    <properties>
+        <java.version>25</java.version>
+        <jda.version>6.7.0</jda.version>
+        <!-- Vor dem ersten Build gegen die aktuelle 3.x-Version pruefen. -->
+        <sqlite-jdbc.version>3.50.3.0</sqlite-jdbc.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-core</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-crypto</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-rcon</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-verify</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-persistence</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-whitelist</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-discord</artifactId><version>${project.version}</version></dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

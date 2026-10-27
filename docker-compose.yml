@@ -1,0 +1,21 @@
+services:
+  rconmc:
+    image: eclipse-temurin:25-jre
+    container_name: rconmc
+    working_dir: /app
+    volumes:
+      - ./app/target/rconmc.jar:/app/app.jar:ro
+      - ./data:/data
+    command: ["java", "-jar", "/app/app.jar"]
+    environment:
+      DISCORD_TOKEN: "DEIN_BOT_TOKEN"
+      RCONMC_MASTER_KEY: "DEIN_BASE64_MASTER_KEY" # openssl rand -base64 32
+      DB_PATH: "/data/rconmc.db"
+      RCONMC_ALLOW_PRIVATE_HOSTS: "true"
+    restart: unless-stopped
+    networks:
+      - ai-stack-network
+
+networks:
+  ai-stack-network:
+    external: true
