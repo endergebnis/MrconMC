@@ -3,7 +3,7 @@ package gg.endergebnis.rconmc.verify;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
-import gg.endergebnis.rconmc.core.AccountVerifier;
+import gg.endergebnis.rconmc.core.verification.AccountVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.JdkClientHttpRequestFactory;

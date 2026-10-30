@@ -2,7 +2,7 @@ package gg.endergebnis.rconmc.discord.modal;
 
 import java.util.concurrent.ExecutorService;
 
-import gg.endergebnis.rconmc.core.RegistrationResult;
+import gg.endergebnis.rconmc.core.whitelist.RegistrationResult;
 import gg.endergebnis.rconmc.discord.button.RegisterButton;
 import gg.endergebnis.rconmc.whitelist.WhitelistService;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;

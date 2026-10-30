@@ -3,10 +3,10 @@ package gg.endergebnis.rconmc.rcon;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import gg.endergebnis.rconmc.core.GatewayException;
-import gg.endergebnis.rconmc.core.MinecraftServerGateway;
-import gg.endergebnis.rconmc.core.ServerTarget;
-import gg.endergebnis.rconmc.core.ServerType;
+import gg.endergebnis.rconmc.core.gateway.GatewayException;
+import gg.endergebnis.rconmc.core.gateway.MinecraftServerGateway;
+import gg.endergebnis.rconmc.core.gateway.ServerTarget;
+import gg.endergebnis.rconmc.core.gateway.ServerType;
 
 /**
  * RCON-Implementierung des {@link MinecraftServerGateway}: eine gecachte {@link RconClient}-Verbindung je Server-ID

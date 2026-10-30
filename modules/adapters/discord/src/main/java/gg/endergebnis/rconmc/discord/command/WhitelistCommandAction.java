@@ -4,8 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import gg.endergebnis.rconmc.core.BatchResult;
-import gg.endergebnis.rconmc.core.WhitelistStatus;
+import gg.endergebnis.rconmc.core.whitelist.BatchResult;
+import gg.endergebnis.rconmc.core.whitelist.WhitelistStatus;
 import gg.endergebnis.rconmc.discord.GuildAdminCheck;
 import gg.endergebnis.rconmc.whitelist.PlayerInfo;
 import gg.endergebnis.rconmc.whitelist.WhitelistService;

@@ -22,6 +22,10 @@
         </dependency>
         <dependency>
             <groupId>gg.endergebnis</groupId>
+            <artifactId>rconmc-management</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>gg.endergebnis</groupId>
             <artifactId>rconmc-verify</artifactId>
         </dependency>
         <dependency>

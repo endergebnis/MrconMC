@@ -4,12 +4,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import gg.endergebnis.rconmc.core.AccountVerifier;
-import gg.endergebnis.rconmc.core.BatchResult;
-import gg.endergebnis.rconmc.core.RegistrationResult;
-import gg.endergebnis.rconmc.core.VerificationException;
-import gg.endergebnis.rconmc.core.VerifiedAccount;
-import gg.endergebnis.rconmc.core.WhitelistStatus;
+import gg.endergebnis.rconmc.core.verification.AccountVerifier;
+import gg.endergebnis.rconmc.core.verification.VerificationException;
+import gg.endergebnis.rconmc.core.verification.VerifiedAccount;
+import gg.endergebnis.rconmc.core.whitelist.BatchResult;
+import gg.endergebnis.rconmc.core.whitelist.RegistrationResult;
+import gg.endergebnis.rconmc.core.whitelist.WhitelistStatus;
 import gg.endergebnis.rconmc.persistence.player.Player;
 import gg.endergebnis.rconmc.persistence.player.PlayerRepository;
 import gg.endergebnis.rconmc.persistence.whitelist.WhitelistEntryRepository;

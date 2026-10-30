@@ -1,4 +1,4 @@
-package gg.endergebnis.rconmc.core;
+package gg.endergebnis.rconmc.core.verification;
 
 import java.util.Optional;
 

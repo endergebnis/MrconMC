@@ -8,6 +8,11 @@ rconmc:
     max-per-guild: ${RCONMC_MAX_SERVERS_PER_GUILD:5}
     # false = Hosts in privaten/lokalen Netzen ablehnen (empfohlen, sobald fremde Guilds den Bot nutzen)
     allow-private-hosts: ${RCONMC_ALLOW_PRIVATE_HOSTS:true}
+  management:
+    # Nur fuer Management-Protocol-Server mit TLS (wss://) und selbst signiertem Zertifikat: Truststore (PKCS12/JKS)
+    # mit dem Serverzertifikat. Leer = Standard-Truststore der JVM. Die Zertifikatspruefung bleibt immer aktiv.
+    truststore-path: ${RCONMC_MGMT_TRUSTSTORE_PATH:}
+    truststore-password: ${RCONMC_MGMT_TRUSTSTORE_PASSWORD:}
 
 spring:
   datasource:

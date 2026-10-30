@@ -4,9 +4,9 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import gg.endergebnis.rconmc.core.GatewayException;
-import gg.endergebnis.rconmc.core.MinecraftServerGateway;
-import gg.endergebnis.rconmc.core.ServerType;
+import gg.endergebnis.rconmc.core.gateway.GatewayException;
+import gg.endergebnis.rconmc.core.gateway.MinecraftServerGateway;
+import gg.endergebnis.rconmc.core.gateway.ServerType;
 import org.springframework.stereotype.Component;
 
 /** Waehlt die passende {@link MinecraftServerGateway}-Implementierung anhand des Server-Typs. */

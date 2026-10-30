@@ -2,7 +2,7 @@ package gg.endergebnis.rconmc.persistence.server;
 
 import java.time.Instant;
 
-import gg.endergebnis.rconmc.core.ServerType;
+import gg.endergebnis.rconmc.core.gateway.ServerType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

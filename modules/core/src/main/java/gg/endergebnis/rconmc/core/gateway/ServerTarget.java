@@ -1,4 +1,4 @@
-package gg.endergebnis.rconmc.core;
+package gg.endergebnis.rconmc.core.gateway;
 
 /** Entschluesselte Verbindungsdaten eines Servers. Das Secret taucht in keiner {@code toString()}-Ausgabe auf. */
 public record ServerTarget(long serverId, ServerType type, String host, int port, String secret) {

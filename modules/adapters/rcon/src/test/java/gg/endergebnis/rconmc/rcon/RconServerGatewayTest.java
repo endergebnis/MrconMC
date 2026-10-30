@@ -6,9 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.IOException;
 import java.util.List;
 
-import gg.endergebnis.rconmc.core.GatewayException;
-import gg.endergebnis.rconmc.core.ServerTarget;
-import gg.endergebnis.rconmc.core.ServerType;
+import gg.endergebnis.rconmc.core.gateway.GatewayException;
+import gg.endergebnis.rconmc.core.gateway.ServerTarget;
+import gg.endergebnis.rconmc.core.gateway.ServerType;
 import org.junit.jupiter.api.Test;
 
 class RconServerGatewayTest {

@@ -1,4 +1,4 @@
-package gg.endergebnis.rconmc.core;
+package gg.endergebnis.rconmc.core.verification;
 
 /** Die Verifizierung konnte nicht durchgefuehrt werden (Netzwerk, HTTP-Status, ...) - nicht: Name existiert nicht. */
 public class VerificationException extends RuntimeException {

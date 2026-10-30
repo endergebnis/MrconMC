@@ -1,6 +1,6 @@
 package gg.endergebnis.rconmc.whitelist.server;
 
-import gg.endergebnis.rconmc.core.ServerType;
+import gg.endergebnis.rconmc.core.gateway.ServerType;
 
 /** Anzeigedaten eines Servers - bewusst ohne Secret. */
 public record ServerSummary(String name, ServerType type, String host, int port, boolean enabled) {}

@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import gg.endergebnis.rconmc.core.GatewayException;
-import gg.endergebnis.rconmc.core.ServerTarget;
-import gg.endergebnis.rconmc.core.ServerType;
+import gg.endergebnis.rconmc.core.gateway.GatewayException;
+import gg.endergebnis.rconmc.core.gateway.ServerTarget;
+import gg.endergebnis.rconmc.core.gateway.ServerType;
 import gg.endergebnis.rconmc.crypto.SecretCipher;
 import gg.endergebnis.rconmc.persistence.server.MinecraftServer;
 import gg.endergebnis.rconmc.persistence.server.MinecraftServerRepository;

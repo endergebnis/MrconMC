@@ -1,4 +1,4 @@
-package gg.endergebnis.rconmc.core;
+package gg.endergebnis.rconmc.core.gateway;
 
 /**
  * Port zu einem Minecraft-Server. Implementierungen (RCON, spaeter Management Protocol) werden anhand von

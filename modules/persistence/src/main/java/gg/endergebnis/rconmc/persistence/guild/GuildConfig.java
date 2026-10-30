@@ -1,6 +1,6 @@
 package gg.endergebnis.rconmc.persistence.guild;
 
-import gg.endergebnis.rconmc.core.WhitelistStatus;
+import gg.endergebnis.rconmc.core.whitelist.WhitelistStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

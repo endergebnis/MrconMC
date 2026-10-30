@@ -1,4 +1,4 @@
-package gg.endergebnis.rconmc.core;
+package gg.endergebnis.rconmc.core.gateway;
 
 /** Verbindungs-, Protokoll- oder Authentifizierungsfehler beim Zugriff auf einen Minecraft-Server. */
 public class GatewayException extends RuntimeException {

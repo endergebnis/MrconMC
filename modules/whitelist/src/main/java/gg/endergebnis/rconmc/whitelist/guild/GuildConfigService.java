@@ -2,7 +2,7 @@ package gg.endergebnis.rconmc.whitelist.guild;
 
 import java.util.Optional;
 
-import gg.endergebnis.rconmc.core.WhitelistStatus;
+import gg.endergebnis.rconmc.core.whitelist.WhitelistStatus;
 import gg.endergebnis.rconmc.persistence.guild.GuildConfig;
 import gg.endergebnis.rconmc.persistence.guild.GuildConfigRepository;
 import org.springframework.stereotype.Service;

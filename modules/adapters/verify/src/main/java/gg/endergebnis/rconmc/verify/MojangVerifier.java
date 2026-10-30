@@ -3,9 +3,9 @@ package gg.endergebnis.rconmc.verify;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import gg.endergebnis.rconmc.core.AccountVerifier;
-import gg.endergebnis.rconmc.core.VerificationException;
-import gg.endergebnis.rconmc.core.VerifiedAccount;
+import gg.endergebnis.rconmc.core.verification.AccountVerifier;
+import gg.endergebnis.rconmc.core.verification.VerificationException;
+import gg.endergebnis.rconmc.core.verification.VerifiedAccount;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;

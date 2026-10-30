@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import gg.endergebnis.rconmc.core.BatchResult;
-import gg.endergebnis.rconmc.core.GatewayException;
-import gg.endergebnis.rconmc.core.MinecraftServerGateway;
+import gg.endergebnis.rconmc.core.gateway.GatewayException;
+import gg.endergebnis.rconmc.core.gateway.MinecraftServerGateway;
+import gg.endergebnis.rconmc.core.whitelist.BatchResult;
 import gg.endergebnis.rconmc.persistence.player.Player;
 import gg.endergebnis.rconmc.persistence.whitelist.WhitelistEntry;
 import gg.endergebnis.rconmc.persistence.whitelist.WhitelistEntryRepository;

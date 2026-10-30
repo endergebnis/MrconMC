@@ -3,6 +3,7 @@ package gg.endergebnis.rconmc.discord.command;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
+import gg.endergebnis.rconmc.core.gateway.ServerType;
 import gg.endergebnis.rconmc.discord.GuildAdminCheck;
 import gg.endergebnis.rconmc.discord.modal.ServerAddModalAction;
 import gg.endergebnis.rconmc.whitelist.server.ServerService;
@@ -11,9 +12,11 @@ import gg.endergebnis.rconmc.whitelist.server.TestResult;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionContextType;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.slf4j.Logger;
@@ -22,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * {@code /server}: Guild-Admins verwalten ihre eigenen Minecraft-Server. {@code add} oeffnet ein Modal, damit das
- * RCON-Passwort nie als Command-Option im Chat-Verlauf landet. Alle Operationen sind auf die aufrufende Guild begrenzt.
+ * RCON-Passwort bzw. Management-Secret nie als Command-Option im Chat-Verlauf landet. Alle Operationen sind auf die aufrufende Guild begrenzt.
  */
 @Component
 public class ServerCommandAction {
@@ -35,6 +38,10 @@ public class ServerCommandAction {
     public static final String SUB_LIST = "list";
     public static final String SUB_TEST = "test";
     public static final String OPTION_NAME = "name";
+    public static final String OPTION_TYPE = "type";
+    static final String TYPE_RCON = "rcon";
+    static final String TYPE_MANAGEMENT = "management";
+    static final String TYPE_MANAGEMENT_TLS = "management-tls";
 
     private final GuildAdminCheck adminCheck;
     private final ServerService serverService;
@@ -50,7 +57,12 @@ public class ServerCommandAction {
         return Commands.slash(COMMAND, "Minecraft-Server dieses Discord-Servers verwalten")
                 .setContexts(InteractionContextType.GUILD)
                 .addSubcommands(
-                        new SubcommandData(SUB_ADD, "Server hinzufügen (Eingabe per Formular)"),
+                        new SubcommandData(SUB_ADD, "Server hinzufügen (Eingabe per Formular)")
+                                .addOptions(new OptionData(OptionType.STRING, OPTION_TYPE, "Verbindungsart (Standard: RCON)")
+                                        .addChoices(
+                                                new Command.Choice("RCON", TYPE_RCON),
+                                                new Command.Choice("Management Protocol (ohne TLS)", TYPE_MANAGEMENT),
+                                                new Command.Choice("Management Protocol (mit TLS)", TYPE_MANAGEMENT_TLS))),
                         new SubcommandData(SUB_REMOVE, "Server entfernen")
                                 .addOption(OptionType.STRING, OPTION_NAME, "Name des Servers", true),
                         new SubcommandData(SUB_LIST, "Server auflisten"),
@@ -75,7 +87,7 @@ public class ServerCommandAction {
             return;
         }
         switch (sub) {
-            case SUB_ADD -> event.replyModal(ServerAddModalAction.modal()).queue();
+            case SUB_ADD -> event.replyModal(ServerAddModalAction.modal(serverType(event))).queue();
             case SUB_REMOVE -> remove(event, guildId);
             case SUB_LIST -> list(event, guildId);
             case SUB_TEST -> test(event, guildId);
@@ -144,6 +156,16 @@ public class ServerCommandAction {
             }
             event.getHook().editOriginal(reply).queue();
         });
+    }
+
+    private static ServerType serverType(SlashCommandInteractionEvent event) {
+        OptionMapping option = event.getOption(OPTION_TYPE);
+        String value = option == null ? TYPE_RCON : option.getAsString();
+        return switch (value) {
+            case TYPE_MANAGEMENT -> ServerType.MGMT_WS;
+            case TYPE_MANAGEMENT_TLS -> ServerType.MGMT_WSS;
+            default -> ServerType.RCON;
+        };
     }
 
     private static String requiredName(SlashCommandInteractionEvent event) {

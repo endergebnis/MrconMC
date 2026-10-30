@@ -2,7 +2,7 @@ package gg.endergebnis.rconmc.discord.modal;
 
 import java.util.concurrent.ExecutorService;
 
-import gg.endergebnis.rconmc.core.ServerType;
+import gg.endergebnis.rconmc.core.gateway.ServerType;
 import gg.endergebnis.rconmc.discord.GuildAdminCheck;
 import gg.endergebnis.rconmc.whitelist.server.AddServerResult;
 import gg.endergebnis.rconmc.whitelist.server.ServerService;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Das Formular von {@code /server add}. Discord kann Modal-Felder nicht maskieren: Das Passwort ist beim Tippen
+ * Das Formular von {@code /server add} (RCON-Passwort oder Management-Secret). Discord kann Modal-Felder nicht maskieren: Das Passwort ist beim Tippen
  * sichtbar, bleibt aber ausserhalb des Chat-Verlaufs und wird weder geloggt noch in der Antwort wiederholt.
  */
 @Component
@@ -42,7 +42,9 @@ public class ServerAddModalAction {
         this.botExecutor = botExecutor;
     }
 
-    public static Modal modal() {
+    /** Das Formular zum Servertyp; der Typ steckt in der Modal-ID, damit {@link #handle} ihn wieder auslesen kann. */
+    public static Modal modal(ServerType type) {
+        boolean management = type.isManagementProtocol();
         TextInput name = TextInput.create(INPUT_NAME, TextInputStyle.SHORT)
                 .setPlaceholder("z. B. survival")
                 .setRequiredRange(1, 32)
@@ -51,21 +53,48 @@ public class ServerAddModalAction {
                 .setPlaceholder("mc.example.org")
                 .setRequiredRange(1, 253)
                 .build();
-        TextInput port = TextInput.create(INPUT_PORT, TextInputStyle.SHORT)
-                .setValue("25575")
-                .setRequiredRange(1, 5)
-                .build();
-        TextInput secret = TextInput.create(INPUT_SECRET, TextInputStyle.SHORT)
-                .setPlaceholder("rcon.password aus der server.properties")
-                .setRequiredRange(1, 256)
-                .build();
-        return Modal.create(MODAL_ID, "Minecraft-Server hinzufügen")
+        TextInput.Builder port = TextInput.create(INPUT_PORT, TextInputStyle.SHORT).setRequiredRange(1, 5);
+        TextInput.Builder secret = TextInput.create(INPUT_SECRET, TextInputStyle.SHORT).setRequiredRange(1, 256);
+        if (management) {
+            port.setPlaceholder("management-server-port aus der server.properties");
+            secret.setPlaceholder("management-server-secret aus der server.properties");
+        } else {
+            port.setValue("25575");
+            secret.setPlaceholder("rcon.password aus der server.properties");
+        }
+        return Modal.create(MODAL_ID + ":" + type.name(), title(type))
                 .addComponents(
                         Label.of("Name", name),
                         Label.of("Host", host),
-                        Label.of("RCON-Port", port),
-                        Label.of("RCON-Passwort", secret))
+                        Label.of(management ? "Management-Port" : "RCON-Port", port.build()),
+                        Label.of(management ? "Management-Secret" : "RCON-Passwort", secret.build()))
                 .build();
+    }
+
+    private static String title(ServerType type) {
+        return switch (type) {
+            case RCON -> "Server hinzufügen: RCON";
+            case MGMT_WS -> "Server hinzufügen: Management";
+            case MGMT_WSS -> "Server hinzufügen: Management (TLS)";
+        };
+    }
+
+    /** @return ob die Modal-ID zu diesem Formular gehoert (egal fuer welchen Servertyp) */
+    public static boolean matches(String modalId) {
+        return modalId.equals(MODAL_ID) || modalId.startsWith(MODAL_ID + ":");
+    }
+
+    /** Servertyp aus der Modal-ID; eine ID ohne Typ (aeltere Formulare) bedeutet RCON. */
+    static ServerType typeOf(String modalId) {
+        String prefix = MODAL_ID + ":";
+        if (!modalId.startsWith(prefix)) {
+            return ServerType.RCON;
+        }
+        try {
+            return ServerType.valueOf(modalId.substring(prefix.length()));
+        } catch (IllegalArgumentException e) {
+            return ServerType.RCON;
+        }
     }
 
     public void handle(ModalInteractionEvent event) {
@@ -79,6 +108,7 @@ public class ServerAddModalAction {
             return;
         }
         long guildId = event.getGuild().getIdLong();
+        ServerType type = typeOf(event.getModalId());
         String name = value(event, INPUT_NAME);
         String host = value(event, INPUT_HOST);
         String portText = value(event, INPUT_PORT);
@@ -96,7 +126,7 @@ public class ServerAddModalAction {
         botExecutor.execute(() -> {
             String reply;
             try {
-                reply = message(serverService.add(guildId, name, ServerType.RCON, host, port, secret));
+                reply = message(serverService.add(guildId, name, type, host, port, secret));
             } catch (RuntimeException e) {
                 log.error("Server konnte nicht hinzugefuegt werden", e);
                 reply = "Interner Fehler aufgetreten. Details stehen im Log.";

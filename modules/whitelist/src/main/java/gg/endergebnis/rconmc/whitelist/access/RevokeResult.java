@@ -1,6 +1,6 @@
 package gg.endergebnis.rconmc.whitelist.access;
 
-import gg.endergebnis.rconmc.core.BatchResult;
+import gg.endergebnis.rconmc.core.whitelist.BatchResult;
 
 /** Ausgang von {@link AccessService#revoke}. */
 public sealed interface RevokeResult {

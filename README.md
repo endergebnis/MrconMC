@@ -1,7 +1,8 @@
 # RconMC (Multi-Guild)
 
 Discord-Bot (Spring Boot + JDA), über den Nutzer ihren Minecraft-Namen registrieren und automatisch auf die
-Whitelist der Minecraft-Server ihrer Discord-Guild gesetzt werden. **Eine Bot-Instanz** bedient mehrere Guilds;
+Whitelist der Minecraft-Server ihrer Discord-Guild gesetzt werden. Die Server werden wahlweise per **RCON** oder per
+**Minecraft Server Management Protocol** (ab Minecraft 1.21.9) angesprochen. **Eine Bot-Instanz** bedient mehrere Guilds;
 jede Guild verwaltet ihre eigenen Minecraft-Server.
 
 ## Projektstruktur
@@ -11,12 +12,13 @@ rconmc/
 ├── pom.xml                  Parent (Versionen, Modulliste)
 ├── app/                     Startbares Spring-Boot-Artefakt (rconmc.jar)
 └── modules/
-    ├── core/                Ports (MinecraftServerGateway, AccountVerifier) und Ergebnistypen
+    ├── core/                Ports und Ergebnistypen, gegliedert in gateway / verification / whitelist
     ├── crypto/              SecretCipher (AES-256-GCM), nur JDK
     ├── persistence/         JPA-Entities, Repositories, Flyway-Migrationen (SQLite)
     ├── whitelist/           Fachlogik, gegliedert in Unterpakete (siehe unten)
     └── adapters/            Alles, was mit der Außenwelt spricht
         ├── rcon/            RconClient, RconServerGateway
+        ├── management/      ManagementClient (JSON-RPC über WebSocket), ManagementServerGateway
         ├── verify/          MojangVerifier
         └── discord/         JDA-Gateway, Commands, Buttons, Modals, Listener
 ```
@@ -27,9 +29,18 @@ rconmc/
 | `persistence` | core |
 | `whitelist` | core, crypto, persistence |
 | `adapters/rcon` | core, slf4j |
+| `adapters/management` | core, slf4j (nur JDK, kein Jackson) |
 | `adapters/verify` | core, Spring Web |
 | `adapters/discord` | whitelist |
 | `app` | alle Adapter |
+
+Pakete in `core` (Abhängigkeiten laufen nur nach unten, keine Zyklen):
+
+| Paket | Inhalt |
+| --- | --- |
+| `core.gateway` | Port zu den Minecraft-Servern: `MinecraftServerGateway`, `ServerTarget`, `ServerType`, `GatewayException` |
+| `core.verification` | Port zur Account-Prüfung: `AccountVerifier`, `VerifiedAccount`, `VerificationException` |
+| `core.whitelist` | Ergebnis- und Statustypen der Whitelist-Logik: `WhitelistStatus`, `BatchResult`, `RegistrationResult` |
 
 Pakete in `persistence` (je Aggregat Entity + Repository zusammen):
 
@@ -50,16 +61,18 @@ Pakete in `whitelist` (Abhängigkeiten laufen nur nach unten, keine Zyklen):
 | `whitelist.server` | `ServerService`, `GatewayRouter`, `HostPolicy`, `ServerLimits` |
 | `whitelist.guild` | `GuildConfigService` (Kanal, Nachricht, Admin-Rolle, Status) |
 
-Ein zweites Gateway (z. B. Management Protocol, `ServerType.MGMT_WS`) ist ein neues Modul unter `modules/adapters/`,
-das `MinecraftServerGateway` implementiert und in `app` als Bean registriert wird; Fachlogik und Discord-Schicht
-ändern sich nicht.
+Jeder Servertyp hat sein eigenes Gateway-Modul unter `modules/adapters/`, das `MinecraftServerGateway` implementiert und in
+`app` als Bean registriert wird. Der `GatewayRouter` wählt das Gateway anhand von `ServerType` (`RCON`, `MGMT_WS`,
+`MGMT_WSS`); Fachlogik, Datenbank und Discord-Schicht kennen nur das Interface. RCON- und Management-Server können in
+derselben Guild gemischt werden.
 
 ## Setup pro Guild
 
 1. Bot einladen, dann als Admin (Recht „Server verwalten“) `/setup channel:#whitelist [admin-role:@Rolle] [message:Text]`.
    Das postet die Registrierungsnachricht und speichert Kanal, Nachricht und Admin-Rolle für diese Guild.
-2. `/server add` öffnet ein Formular (Name, Host, RCON-Port, RCON-Passwort). Die Verbindung wird getestet, erst dann
-   wird gespeichert. Das Passwort wird AES-256-GCM-verschlüsselt abgelegt.
+2. `/server add [type]` öffnet ein Formular (Name, Host, Port, Passwort bzw. Management-Secret). `type` ist `RCON`
+   (Standard), `Management Protocol (ohne TLS)` oder `Management Protocol (mit TLS)`. Die Verbindung wird getestet,
+   erst dann wird gespeichert. Das Secret wird AES-256-GCM-verschlüsselt abgelegt.
 3. `/whitelist open` öffnet die Whitelist; Registrierungen landen sofort auf allen aktiven Servern der Guild.
    Standardmäßig ist die Whitelist einer neuen Guild **geschlossen**.
 
@@ -68,7 +81,7 @@ das `MinecraftServerGateway` implementiert und in `app` als Bean registriert wir
 | Command | Wer | Beschreibung |
 | --- | --- | --- |
 | `/setup` | „Server verwalten“ | Registrierungsnachricht einrichten / verschieben |
-| `/server add \| remove \| list \| test` | Guild-Admin | Eigene Minecraft-Server verwalten |
+| `/server add [type] \| remove \| list \| test` | Guild-Admin | Eigene Minecraft-Server verwalten |
 | `/whitelist open` | Guild-Admin | Whitelist öffnen; fehlende Spieler werden nachgetragen |
 | `/whitelist close [remove-others]` | Guild-Admin | Whitelist schließen (siehe unten); `remove-others` (Standard `true`) entfernt Spieler ohne Freigabe von den Servern |
 | `/whitelist status` | Guild-Admin | Zeigt, ob die Whitelist offen oder geschlossen ist, und wie viele Freigaben es gibt |
@@ -100,6 +113,37 @@ Name dort bis zur manuellen Bereinigung stehen (steht im Log).
 Mandantentrennung: Jeder Service-Aufruf trägt die `guildId` der aufrufenden Guild, alle Abfragen filtern danach.
 Ein MC-Account gehört pro Guild höchstens einem Discord-Nutzer.
 
+## Management Protocol (ab Minecraft 1.21.9)
+
+Alternative zu RCON: JSON-RPC 2.0 über WebSocket. Der Bot nutzt die Methoden `minecraft:allowlist`,
+`minecraft:allowlist/add` und `minecraft:allowlist/remove` (das Protokoll nennt die Whitelist "allowlist").
+Das Protokoll ist in Minecraft standardmäßig **aus**. In der `server.properties` des Minecraft-Servers:
+
+```properties
+management-server-enabled=true
+# Standard ist localhost
+management-server-host=0.0.0.0
+# Standard 0 = bei jedem Start ein zufälliger Port, also fest setzen
+management-server-port=25585
+# 40 Zeichen (A-Z a-z 0-9); leer = der Server erzeugt eins und schreibt es in die Datei
+management-server-secret=DEIN_SECRET
+# siehe Tabelle unten
+management-server-tls-enabled=false
+```
+
+Authentifizierung ist der HTTP-Header `Authorization: Bearer <management-server-secret>` beim Handshake. Beim Hinzufügen
+des Servers trägst du dieses Secret anstelle des RCON-Passworts ein.
+
+| Server-Einstellung | `/server add` → type | Hinweis |
+| --- | --- | --- |
+| `management-server-tls-enabled=false` | `Management Protocol (ohne TLS)` (`ws://`) | Unverschlüsselt, nur im eigenen Netz oder über VPN/SSH-Tunnel |
+| TLS an (Standard; braucht einen PKCS12-Keystore auf dem Server) | `Management Protocol (mit TLS)` (`wss://`) | Bei selbst signiertem Zertifikat den Truststore des Bots setzen (`RCONMC_MGMT_TRUSTSTORE_PATH`). Das Zertifikat muss zum Host passen (CN/SAN) |
+
+Verhalten gegenüber RCON: Der Bot trägt nur den **Namen** ein, der Server löst die UUID selbst auf (Online- und
+Offline-Modus wie bei `whitelist add`). Entfernen sucht den Eintrag in der Allowlist des Servers und löscht ihn mit
+dessen `id`; ist der Name dort nicht (mehr) eingetragen, passiert nichts. Verbindungen werden je Server gehalten und bei
+Abbruch automatisch neu aufgebaut. Ein `ws://`-Server mit TLS (oder umgekehrt) wird beim Test mit einem Hinweis abgelehnt.
+
 ## Konfiguration
 
 | Variable | Beschreibung |
@@ -109,6 +153,7 @@ Ein MC-Account gehört pro Guild höchstens einem Discord-Nutzer.
 | `DB_PATH` | Pfad der SQLite-Datei (Standard `./data/rconmc.db`) |
 | `RCONMC_MAX_SERVERS_PER_GUILD` | Standard `5` |
 | `RCONMC_ALLOW_PRIVATE_HOSTS` | Standard `true`. `false` lehnt Hosts in privaten/lokalen Netzen ab |
+| `RCONMC_MGMT_TRUSTSTORE_PATH` / `RCONMC_MGMT_TRUSTSTORE_PASSWORD` | Optional: Truststore (PKCS12/JKS) für Management-Server mit TLS und selbst signiertem Zertifikat. Leer = Standard-Truststore der JVM |
 
 Alternativ als Docker-Secret über `spring.config.import=optional:configtree:/run/secrets/`
 (Dateien `rconmc.discord.token`, `rconmc.security.master-key`).
@@ -120,11 +165,12 @@ Alternativ als Docker-Secret über `spring.config.import=optional:configtree:/ru
   kompromittierten Host (dort liegt der Key).
 - **Discord-Modals maskieren keine Eingaben**: Das Passwort ist beim Tippen sichtbar. Es steht nie als Command-Option
   im Verlauf, wird nicht geloggt und nicht in Antworten wiederholt.
-- **RCON ist unverschlüsselt.** Server außerhalb des eigenen Netzes nur über VPN/SSH-Tunnel anbinden.
+- **RCON und `ws://` sind unverschlüsselt.** Server außerhalb des eigenen Netzes nur über VPN/SSH-Tunnel anbinden oder das
+  Management Protocol mit TLS (`wss://`) nutzen. Die Zertifikatsprüfung ist nie abschaltbar.
 - **SSRF:** Guild-Admins tragen Host und Port selbst ein; der Bot verbindet dorthin. Bei `allow-private-hosts=true`
   können sie über Fehlermeldungen interne Adressen des Bot-Hosts sondieren. Sobald fremde Guilds den Bot nutzen:
   `false` setzen und den Egress des Containers per Firewall begrenzen.
-- Passwort-Änderung eines Servers: `/server remove` und neu hinzufügen.
+- Passwort-/Secret-Änderung eines Servers: `/server remove` und neu hinzufügen.
 
 ## Datenbank
 

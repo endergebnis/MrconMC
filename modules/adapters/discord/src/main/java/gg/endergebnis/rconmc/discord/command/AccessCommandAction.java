@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 
-import gg.endergebnis.rconmc.core.BatchResult;
+import gg.endergebnis.rconmc.core.whitelist.BatchResult;
 import gg.endergebnis.rconmc.discord.GuildAdminCheck;
 import gg.endergebnis.rconmc.whitelist.access.AccessService;
 import gg.endergebnis.rconmc.whitelist.access.AllowResult;

@@ -7,8 +7,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import gg.endergebnis.rconmc.core.VerificationException;
-import gg.endergebnis.rconmc.core.VerifiedAccount;
+import gg.endergebnis.rconmc.core.verification.VerificationException;
+import gg.endergebnis.rconmc.core.verification.VerifiedAccount;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

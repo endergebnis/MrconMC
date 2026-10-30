@@ -28,6 +28,7 @@
         <module>modules/whitelist</module>
         <!-- Adapter: alles, was mit der Aussenwelt spricht -->
         <module>modules/adapters/rcon</module>
+        <module>modules/adapters/management</module>
         <module>modules/adapters/verify</module>
         <module>modules/adapters/discord</module>
         <!-- Startbares Artefakt -->
@@ -46,6 +47,7 @@
             <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-core</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-crypto</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-rcon</artifactId><version>${project.version}</version></dependency>
+            <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-management</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-verify</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-persistence</artifactId><version>${project.version}</version></dependency>
             <dependency><groupId>gg.endergebnis</groupId><artifactId>rconmc-whitelist</artifactId><version>${project.version}</version></dependency>

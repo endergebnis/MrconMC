@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import gg.endergebnis.rconmc.core.BatchResult;
-import gg.endergebnis.rconmc.core.WhitelistStatus;
+import gg.endergebnis.rconmc.core.whitelist.BatchResult;
+import gg.endergebnis.rconmc.core.whitelist.WhitelistStatus;
 import gg.endergebnis.rconmc.persistence.player.Player;
 import gg.endergebnis.rconmc.persistence.player.PlayerRepository;
 import gg.endergebnis.rconmc.persistence.whitelist.WhitelistBypass;

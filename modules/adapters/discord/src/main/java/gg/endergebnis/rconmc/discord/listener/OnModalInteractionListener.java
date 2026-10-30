@@ -21,12 +21,12 @@ public class OnModalInteractionListener extends ListenerAdapter {
 
     @Override
     public void onModalInteraction(ModalInteractionEvent event) {
-        switch (event.getModalId()) {
-            case RegisterButton.MODAL_ID -> registerModal.handle(event);
-            case ServerAddModalAction.MODAL_ID -> serverAddModal.handle(event);
-            default -> {
-                // Nicht unser Modal.
-            }
+        String modalId = event.getModalId();
+        if (modalId.equals(RegisterButton.MODAL_ID)) {
+            registerModal.handle(event);
+        } else if (ServerAddModalAction.matches(modalId)) {
+            serverAddModal.handle(event);
         }
+        // Alles andere ist nicht unser Modal.
     }
 }
